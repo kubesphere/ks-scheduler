@@ -1,2 +1,2 @@
-# pipeline-scheduler-extender
-pipeline-scheduler-extender
+# ks-scheduler
+ks-scheduler
