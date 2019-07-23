@@ -29,7 +29,7 @@ func Run() {
 	}
 
 	log.Info("info: server starting on the port :8080")
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	if err := http.ListenAndServe(":80", router); err != nil {
 		log.Fatal(err)
 	}
 }

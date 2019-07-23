@@ -8,17 +8,29 @@ import (
 var (
 	PipelinePriority = Prioritize{
 		Name: "pipelinePriority",
-		// TODO add func
-		Func: func(_ v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error) {
-			var priorityList schedulerapi.HostPriorityList
-			priorityList = make([]schedulerapi.HostPriority, len(nodes))
-			for i, node := range nodes {
-				priorityList[i] = schedulerapi.HostPriority{
-					Host:  node.Name,
-					Score: 0,
-				}
-			}
-			return &priorityList, nil
-		},
+		Func: Pipeline,
 	}
 )
+
+func Pipeline(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error) {
+	var priorityList schedulerapi.HostPriorityList
+	priorityList = make([]schedulerapi.HostPriority, len(nodes))
+	keys := parseMark(pod.Labels)
+
+	for i, node := range nodes {
+		score, err := Calculation(keys, node)
+		if err != nil {
+			panic(err)
+		}
+
+		priorityList[i] = schedulerapi.HostPriority{
+			Host:  node.Name,
+			Score: score,
+		}
+	}
+	return &priorityList, nil
+}
+
+func parseMark(labels map[string]string) ([]string) {}
+
+func Calculation(keys []string, node v1.Node) (score int, err error) {}
