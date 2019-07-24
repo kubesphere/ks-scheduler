@@ -7,8 +7,9 @@ import (
 
 var (
 	PipelinePriority = Prioritize{
-		Name: "pipelinePriority",
-		Func: Pipeline,
+		Name:      "pipeline",
+		Func:      Pipeline,
+		//Datatable: sqlite.InitKeyNodeTable(),
 	}
 )
 
@@ -31,6 +32,16 @@ func Pipeline(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, erro
 	return &priorityList, nil
 }
 
-func parseMark(labels map[string]string) ([]string) {}
+func parseMark(labels map[string]string) ([]string) {
 
-func Calculation(keys []string, node v1.Node) (score int, err error) {}
+	var test []string
+	test = append(test, "aa")
+	return test
+
+}
+
+func Calculation(keys []string, node v1.Node) (score int, err error) {
+
+	score = 1
+	return score, nil
+}

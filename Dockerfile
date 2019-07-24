@@ -1,6 +1,6 @@
 FROM golang:1.10-alpine as builder
 
-ENV CGO_ENABLED=0
+ENV CGO_ENABLED=1
 ENV GOOS=linux
 ENV GOARCH=amd64
 ENV VERSION=2.1.0

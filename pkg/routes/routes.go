@@ -4,19 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+
 	"github.com/julienschmidt/httprouter"
 	"github.com/soulseen/ks-schduler/pkg/predicate"
 	"github.com/soulseen/ks-schduler/pkg/prioritize"
-	"io"
+
+	log "github.com/golang/glog"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
-	"log"
-	"net/http"
-	"os"
 )
 
 const (
 	versionPath      = "/v1alpha2"
-	apiPrefix        = "/scheduler"
+	apiPrefix        = versionPath
 	predicatesPrefix = apiPrefix + "/predicates"
 	prioritiesPrefix = apiPrefix + "/priorities"
 )
@@ -34,7 +36,7 @@ func PredicateRoute(predicate predicate.Predicate) httprouter.Handle {
 
 		var buf bytes.Buffer
 		body := io.TeeReader(r.Body, &buf)
-		log.Print("info: ", predicate.Name, " ExtenderArgs = ", buf.String())
+		log.Info("info: ", predicate.Name, " ExtenderArgs = ", buf.String())
 
 		var extenderArgs schedulerapi.ExtenderArgs
 		var extenderFilterResult *schedulerapi.ExtenderFilterResult
@@ -46,13 +48,14 @@ func PredicateRoute(predicate predicate.Predicate) httprouter.Handle {
 				Error:       err.Error(),
 			}
 		} else {
+			log.Info("body: ", extenderArgs)
 			extenderFilterResult = predicate.Handler(extenderArgs)
 		}
 
 		if resultBody, err := json.Marshal(extenderFilterResult); err != nil {
 			panic(err)
 		} else {
-			log.Print("info: ", predicate.Name, " extenderFilterResult = ", string(resultBody))
+			log.Info("info: ", predicate.Name, " extenderFilterResult = ", string(resultBody))
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			w.Write(resultBody)
@@ -66,7 +69,7 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 
 		var buf bytes.Buffer
 		body := io.TeeReader(r.Body, &buf)
-		log.Print("info: ", prioritize.Name, " ExtenderArgs = ", buf.String())
+		log.Info("info: " + prioritize.Name + " ExtenderArgs = " + buf.String())
 
 		var extenderArgs schedulerapi.ExtenderArgs
 		var hostPriorityList *schedulerapi.HostPriorityList
@@ -74,6 +77,8 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 		if err := json.NewDecoder(body).Decode(&extenderArgs); err != nil {
 			panic(err)
 		}
+
+		log.Info("body: ", extenderArgs)
 
 		if list, err := prioritize.Handler(extenderArgs); err != nil {
 			panic(err)
@@ -84,7 +89,7 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 		if resultBody, err := json.Marshal(hostPriorityList); err != nil {
 			panic(err)
 		} else {
-			log.Print("info: ", prioritize.Name, " hostPriorityList = ", string(resultBody))
+			log.Info("info: ", prioritize.Name, " hostPriorityList = ", string(resultBody))
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			w.Write(resultBody)
@@ -102,9 +107,9 @@ func AddVersion(router *httprouter.Router) {
 
 func DebugLogging(h httprouter.Handle, path string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		log.Print("debug: ", path, " request body = ", r.Body)
+		log.Info("debug: ", path, " request body = ", r.Body)
 		h(w, r, p)
-		log.Print("debug: ", path, " response=", w)
+		log.Info("debug: ", path, " response=", w)
 	}
 }
 
