@@ -1,6 +1,7 @@
 package prioritize
 
 import (
+	"github.com/soulseen/ks-pipeline-schduler/pkg/sqlite"
 	"k8s.io/api/core/v1"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
@@ -9,7 +10,7 @@ var (
 	PipelinePriority = Prioritize{
 		Name:      "pipeline",
 		Func:      Pipeline,
-		//Datatable: sqlite.InitKeyNodeTable(),
+		Datatable: sqlite.InitKeyNodeTable(),
 	}
 )
 

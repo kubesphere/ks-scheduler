@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
+	"os"
 )
 
 const (
-	DATA_PATH        = "/Users/xiaoyangzhu/work/kubesphere/ks-scheduler/test/sqlite3"
+	DATA_PATH = "/home/data"
 	CREATE_TABLE_SQL = `
 		CREATE TABLE IF NOT EXISTS key_node 
 		(
@@ -24,7 +25,7 @@ type KeyNodeTable struct {
 }
 
 func InitKeyNodeTable() (KeyNodeTable) {
-	db, err := sql.Open("sqlite3", DATA_PATH)
+	db, err := sql.Open("sqlite3", os.Getenv(DATA_PATH))
 	checkErr(err)
 	CreateTable(db, CREATE_TABLE_SQL)
 	KeyNodeCilent := KeyNodeTable{

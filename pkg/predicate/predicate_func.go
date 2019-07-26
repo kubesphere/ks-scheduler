@@ -1,12 +1,19 @@
 package predicate
 
-import "k8s.io/api/core/v1"
+import (
+	log "github.com/golang/glog"
+	"k8s.io/api/core/v1"
+)
 
 var (
 	TruePredicate = Predicate{
-		Name: "alwaysTrue",
-		Func: func(pod v1.Pod, node v1.Node) (bool, error) {
-			return true, nil
-		},
+		Name: "alwaystrue",
+		Func: alwaysTrue,
 	}
 )
+
+func alwaysTrue(pod v1.Pod, node v1.Node) (bool, error) {
+	log.Info("podddd")
+	log.Info(pod)
+	return true, nil
+}

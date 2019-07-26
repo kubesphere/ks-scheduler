@@ -1,4 +1,4 @@
-module github.com/soulseen/ks-schduler
+module github.com/soulseen/ks-pipeline-schduler
 
 go 1.12
 

@@ -9,16 +9,16 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/soulseen/ks-schduler/pkg/predicate"
-	"github.com/soulseen/ks-schduler/pkg/prioritize"
+	"github.com/soulseen/ks-pipeline-schduler/pkg/predicate"
+	"github.com/soulseen/ks-pipeline-schduler/pkg/prioritize"
 
 	log "github.com/golang/glog"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 
 const (
-	versionPath      = "/v1alpha2"
-	apiPrefix        = versionPath
+	versionPath      = "/version"
+	apiPrefix        = "/scheduler"
 	predicatesPrefix = apiPrefix + "/predicates"
 	prioritiesPrefix = apiPrefix + "/priorities"
 )
@@ -70,6 +70,8 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 		var buf bytes.Buffer
 		body := io.TeeReader(r.Body, &buf)
 		log.Info("info: " + prioritize.Name + " ExtenderArgs = " + buf.String())
+		log.Info("func PrioritizeRoute")
+
 
 		var extenderArgs schedulerapi.ExtenderArgs
 		var hostPriorityList *schedulerapi.HostPriorityList
@@ -115,10 +117,12 @@ func DebugLogging(h httprouter.Handle, path string) httprouter.Handle {
 
 func AddPredicate(router *httprouter.Router, predicate predicate.Predicate) {
 	path := predicatesPrefix + "/" + predicate.Name
+	fmt.Println(path)
 	router.POST(path, DebugLogging(PredicateRoute(predicate), path))
 }
 
 func AddPrioritize(router *httprouter.Router, prioritize prioritize.Prioritize) {
 	path := prioritiesPrefix + "/" + prioritize.Name
+	fmt.Println(path)
 	router.POST(path, DebugLogging(PrioritizeRoute(prioritize), path))
 }

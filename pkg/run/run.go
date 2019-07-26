@@ -6,9 +6,9 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/soulseen/ks-schduler/pkg/predicate"
-	"github.com/soulseen/ks-schduler/pkg/prioritize"
-	"github.com/soulseen/ks-schduler/pkg/routes"
+	"github.com/soulseen/ks-pipeline-schduler/pkg/predicate"
+	"github.com/soulseen/ks-pipeline-schduler/pkg/prioritize"
+	"github.com/soulseen/ks-pipeline-schduler/pkg/routes"
 
 	log "github.com/golang/glog"
 )
