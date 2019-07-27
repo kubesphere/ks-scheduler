@@ -1,8 +1,60 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ks-scheduler-config
+  namespace: kubesphere-system
+data:
+  config.yaml: |
+    apiVersion: kubescheduler.config.k8s.io/v1alpha1
+    kind: KubeSchedulerConfiguration
+    schedulerName: ks-scheduler
+    algorithmSource:
+      policy:
+        configMap:
+          namespace: kubesphere-system
+          name: ks-scheduler-policy
+    leaderElection:
+      leaderElect: false
+      lockObjectName: ks-scheduler
+      lockObjectNamespace: kubesphere-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ks-scheduler-policy
+  namespace: kubesphere-system
+data:
+  policy.cfg: |
+    {
+      "kind" : "Policy",
+      "apiVersion" : "v1",
+      "predicates" : [
+        {"name" : "PodFitsHostPorts"},
+        {"name" : "PodFitsResources"},
+        {"name" : "NoDiskConflict"},
+        {"name" : "MatchNodeSelector"}
+      ],
+      "priorities" : [
+        {"name" : "LeastRequestedPriority", "weight" : 1},
+        {"name" : "BalancedResourceAllocation", "weight" : 1},
+        {"name" : "ImageLocalityPriority", "weight" : 1}
+      ],
+      "extenders" : [{
+        "urlPrefix": "http://localhost:8080/scheduler",
+        "filterVerb": "predicates/alwaystrue",
+        "prioritizeVerb": "priorities/pipeline",
+        "weight": 3,
+        "enableHttps": false,
+        "nodeCacheCapable": false
+      }],
+      "hardPodAffinitySymmetricWeight" : 10
+    }
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: ks-scheduler
-  namespace: kube-system
+  namespace: kubesphere-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -11,7 +63,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: ks-scheduler
-    namespace: kube-system
+    namespace: kubesphere-system
 roleRef:
   kind: ClusterRole
   name: system:kube-scheduler
@@ -21,7 +73,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ks-scheduler
-  namespace: kube-system
+  namespace: kubesphere-system
   labels:
     app: ks-scheduler
     version: advanced-2.1.0
@@ -41,10 +93,6 @@ spec:
       nodeSelector:
         role: master
       volumes:
-      - hostPath:
-          path: /etc/kubernetes/scheduler.conf
-          type: FileOrCreate
-        name: kubeconfig
       - name: ks-scheduler-config
         configMap:
           name: ks-scheduler-config
@@ -55,20 +103,17 @@ spec:
           args:
             - kube-scheduler
             - --address=0.0.0.0
+            - --v=5
             - --scheduler-name=ks-scheduler
             - --feature-gates=KubeletPluginsWatcher=false,CSINodeInfo=false,CSIDriverRegistry=false,RotateKubeletClientCertificate=true
-            - --kubeconfig=/etc/kubernetes/scheduler.conf
             - --leader-elect=false
             - --config=/ks-scheduler/config.yaml
           volumeMounts:
-          - mountPath: /etc/kubernetes/scheduler.conf
-            name: kubeconfig
-            readOnly: true
           - name: ks-scheduler-config
             mountPath: /ks-scheduler
         - name: ks-scheduler-pipeline
           image: zhuxiaoyang/ks-pipeline-scheduler:alpine
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /version
@@ -79,22 +124,3 @@ spec:
               port: 8080
           ports:
             - containerPort: 8080
-#---
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  labels:
-#    app: ks-pipeline-scheduler
-#    version: advanced-2.1.0
-#  name: ks-pipeline-scheduler
-#  namespace: kube-system
-#spec:
-#  ports:
-#    - port: 8080
-#      protocol: TCP
-#      targetPort: 8080
-#  selector:
-#    app: ks-pipeline-scheduler
-#    version: advanced-2.1.0
-#  sessionAffinity: None
-#  type: ClusterIP
