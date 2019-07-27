@@ -9,8 +9,21 @@ import (
 	"github.com/soulseen/ks-pipeline-schduler/pkg/predicate"
 	"github.com/soulseen/ks-pipeline-schduler/pkg/prioritize"
 	"github.com/soulseen/ks-pipeline-schduler/pkg/routes"
+	_ "github.com/soulseen/ks-pipeline-schduler/pkg/sqlite"
 
 	log "github.com/golang/glog"
+)
+
+var (
+	PipelinePriority = prioritize.Prioritize{
+		Name:      "pipeline",
+		Func:      prioritize.Pipeline,
+	}
+
+	TruePredicate = predicate.Predicate{
+		Name: "alwaystrue",
+		Func: predicate.AlwaysTrue,
+	}
 )
 
 func Run() {
@@ -18,15 +31,16 @@ func Run() {
 
 	flag.Parse()
 
+
 	router := httprouter.New()
 	routes.AddVersion(router)
 
-	predicates := []predicate.Predicate{predicate.TruePredicate}
+	predicates := []predicate.Predicate{TruePredicate}
 	for _, p := range predicates {
 		routes.AddPredicate(router, p)
 	}
 
-	priorities := []prioritize.Prioritize{prioritize.PipelinePriority}
+	priorities := []prioritize.Prioritize{PipelinePriority}
 	for _, p := range priorities {
 		routes.AddPrioritize(router, p)
 	}

@@ -2,13 +2,11 @@ package sqlite
 
 import (
 	"database/sql"
-	"fmt"
+	log "github.com/golang/glog"
 	_ "github.com/mattn/go-sqlite3"
-	"os"
 )
 
 const (
-	DATA_PATH = "/home/data"
 	CREATE_TABLE_SQL = `
 		CREATE TABLE IF NOT EXISTS key_node 
 		(
@@ -20,12 +18,11 @@ const (
 	;`
 )
 
-type KeyNodeTable struct {
-	SQLiteDB *sql.DB `json:",omitempty"`
-}
+var KeyNodeCilent = InitKeyNodeTable()
 
 func InitKeyNodeTable() (KeyNodeTable) {
-	db, err := sql.Open("sqlite3", os.Getenv(DATA_PATH))
+	db, err := sql.Open("sqlite3", "/Users/xiaoyangzhu/work/test/sqlite/test.db")
+	err = db.Ping()
 	checkErr(err)
 	CreateTable(db, CREATE_TABLE_SQL)
 	KeyNodeCilent := KeyNodeTable{
@@ -40,33 +37,43 @@ func CreateTable(db *sql.DB, sql string) {
 	checkErr(error)
 }
 
-func (kn *KeyNodeTable) KeyNodeInsert(key, nodeName string) (id int64) {
-	stmt, err := kn.SQLiteDB.Prepare("INSERT INTO userinfo(podkey, nodename, count) values(?,?,?)")
-	checkErr(err)
+func (kn *KeyNodeTable) KeyNodeInsert(key, nodeName string, count int) (id int64, err error) {
+	tx, err := kn.SQLiteDB.Begin()
+	stmt, err := tx.Prepare("INSERT INTO key_node(podkey, nodename, count) VALUES (?,?,?)")
+	if err != nil {
+		return 1, err
+	}
+	defer stmt.Close()
 
-	res, err := stmt.Exec(key, nodeName, 0)
+	stmt.Exec(key, nodeName, count)
 	checkErr(err)
-	id, _ = res.LastInsertId()
-	return id
+	tx.Commit()
+	return id, nil
 }
 
-func (kn *KeyNodeTable) KeyNodeSearch() {
+func (kn *KeyNodeTable) KeyNodeSearch(podKey string, nodeName string) ([]KeyNodeTable, error) {
+	rows, err := kn.SQLiteDB.Query("SELECT *  FROM key_node WHERE podkey = ? AND nodename = ?", podKey,nodeName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-	rows, err := kn.SQLiteDB.Query("SELECT * FROM userinfo")
-	checkErr(err)
+	res := []KeyNodeTable{}
 
 	for rows.Next() {
-		var id int
-		var podkey string
-		var nodename string
-		var count int
+		var id, count int
+		var podkey, nodename string
+
 		err = rows.Scan(&id, &podkey, &nodename, &count)
 		checkErr(err)
-		fmt.Println(id)
-		fmt.Println(podkey)
-		fmt.Println(nodename)
-		fmt.Println(count)
+
+		res = append(res, KeyNodeTable{
+			Id:     id,
+			PodKey: podkey,
+			Count: count,
+		})
 	}
+	return res, nil
 
 }
 
@@ -141,6 +148,7 @@ func (kn *KeyNodeTable) KeyNodeSearch() {
 
 func checkErr(err error) {
 	if err != nil {
+		log.Fatal(err)
 		panic(err)
 	}
 }

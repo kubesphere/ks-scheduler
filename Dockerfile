@@ -4,6 +4,7 @@ ENV CGO_ENABLED=1
 ENV VERSION=2.1.0
 ENV GO111MODULE=auto
 ENV GOMOD=/root/go.mod
+ENV DATA_PATH=/data/scheduler.db
 
 # build
 WORKDIR /root/

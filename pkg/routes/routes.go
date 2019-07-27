@@ -117,12 +117,10 @@ func DebugLogging(h httprouter.Handle, path string) httprouter.Handle {
 
 func AddPredicate(router *httprouter.Router, predicate predicate.Predicate) {
 	path := predicatesPrefix + "/" + predicate.Name
-	fmt.Println(path)
 	router.POST(path, DebugLogging(PredicateRoute(predicate), path))
 }
 
 func AddPrioritize(router *httprouter.Router, prioritize prioritize.Prioritize) {
 	path := prioritiesPrefix + "/" + prioritize.Name
-	fmt.Println(path)
 	router.POST(path, DebugLogging(PrioritizeRoute(prioritize), path))
 }
