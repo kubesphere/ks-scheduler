@@ -1,9 +1,8 @@
 package prioritize
 
 import (
-	"fmt"
 	log "github.com/golang/glog"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/sqlite"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
 	"k8s.io/api/core/v1"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 	"strings"
@@ -62,12 +61,10 @@ func Calculation(keys []string, nodeName string) (int, error) {
 		}
 		if len(row) != 0 {
 			score = int(float64(i)*scoreSegment + scoreSegment + float64(row[0].Count/10))
-			fmt.Println(keys[i], score)
 			log.Info("Calculation result: key - ", keys[i], "score - ", score)
 			break
 		}
 	}
-
 	return score, nil
 }
 

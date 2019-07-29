@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/soulseen/ks-pipeline-schduler/pkg/run"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/run"
 )
 
 func main() {

@@ -9,8 +9,8 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/predicate"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/prioritize"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/predicate"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
 
 	log "github.com/golang/glog"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
@@ -109,7 +109,7 @@ func AddVersion(router *httprouter.Router) {
 
 func DebugLogging(h httprouter.Handle, path string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		log.Info("debug: ", path, " request body = ", r.Body)
+		log.Info("debug: ", path)
 		h(w, r, p)
 		log.Info("debug: ", path, " response=", w)
 	}

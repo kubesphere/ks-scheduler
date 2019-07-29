@@ -1,16 +1,23 @@
-module github.com/soulseen/ks-pipeline-schduler
+module github.com/soulseen/ks-pipeline-scheduler
 
 go 1.12
 
 require (
+	github.com/go-logr/logr v0.1.0 // indirect
+	github.com/go-logr/zapr v0.1.1 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
+	github.com/gophercloud/gophercloud v0.1.0 // indirect
 	github.com/julienschmidt/httprouter v1.2.0
-	github.com/labstack/echo v3.3.10+incompatible // indirect
-	github.com/labstack/gommon v0.2.9 // indirect
 	github.com/mattn/go-sqlite3 v1.11.0
-	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4 // indirect
-	k8s.io/api v0.0.0-20190720062849-3043179095b6
-	k8s.io/cri-api v0.0.0-20190711114129-0b0c4484b3d3 // indirect
+	go.uber.org/atomic v1.4.0 // indirect
+	go.uber.org/multierr v1.1.0 // indirect
+	go.uber.org/zap v1.10.0 // indirect
+	k8s.io/api v0.0.0-20190726022912-69e1bce1dad5
+	k8s.io/apimachinery v0.0.0-20190727130956-f97a4e5b4abc
+	k8s.io/client-go v12.0.0+incompatible
+	k8s.io/klog v0.3.3 // indirect
 	k8s.io/kubernetes v1.14.4
-	rsc.io/quote v1.5.2 // indirect
+	k8s.io/sample-controller v0.0.0-20190726024244-fdfa0b050b6a
+	k8s.io/utils v0.0.0-20190607212802-c55fbcfc754a // indirect
+	sigs.k8s.io/controller-runtime v0.1.12
 )

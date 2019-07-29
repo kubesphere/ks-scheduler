@@ -2,7 +2,7 @@ package prioritize
 
 import (
 	"k8s.io/api/core/v1"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/sqlite"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 

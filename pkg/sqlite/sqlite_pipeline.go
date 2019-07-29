@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	log "github.com/golang/glog"
 	_ "github.com/mattn/go-sqlite3"
+	"os"
 )
 
 const (
@@ -21,7 +22,7 @@ const (
 var KeyNodeCilent = InitKeyNodeTable()
 
 func InitKeyNodeTable() (KeyNodeTable) {
-	db, err := sql.Open("sqlite3", "/Users/xiaoyangzhu/work/test/sqlite/test.db")
+	db, err := sql.Open("sqlite3", os.Getenv("DATA_PATH"))
 	err = db.Ping()
 	checkErr(err)
 	CreateTable(db, CREATE_TABLE_SQL)
@@ -77,74 +78,19 @@ func (kn *KeyNodeTable) KeyNodeSearch(podKey string, nodeName string) ([]KeyNode
 
 }
 
-//func (kn *KeyNodeTable) update() {
-//
-//}
+func (kn *KeyNodeTable) KeyNodeUpdate(id int64, count int)(int64, error){
+	//update
+	stmt, err := kn.SQLiteDB.Prepare("update key_node set count=? where id=?")
+	checkErr(err)
 
-//func sqlite() {
-//	db, err := sql.Open("sqlite3", "/Users/xiaoyangzhu/work/test/sqlite/test.db")
-//	checkErr(err)
-//
-//	sqlStmt := `
-//	create table test (id integer not null primary key, name text);
-//	delete from foo;
-//	`
-//
-//	//insert
-//	stmt, err := db.Prepare("INSERT INTO userinfo(username, department, created) values(?,?,?)")
-//	checkErr(err)
-//
-//	res, err := stmt.Exec("astaxie", "研发部门", "2012-12-09")
-//	checkErr(err)
-//
-//	id, err := res.LastInsertId()
-//	checkErr(err)
-//
-//	fmt.Println(id)
-//	//update
-//	stmt, err = db.Prepare("update userinfo set username=? where uid=?")
-//	checkErr(err)
-//
-//	res, err = stmt.Exec("astaxieupdate", id)
-//	checkErr(err)
-//
-//	affect, err := res.RowsAffected()
-//	checkErr(err)
-//
-//	fmt.Println(affect)
-//
-//	//search
-//	rows, err := db.Query("SELECT * FROM userinfo")
-//	checkErr(err)
-//
-//	for rows.Next() {
-//		var uid int
-//		var username string
-//		var department string
-//		var created time.Time
-//		err = rows.Scan(&uid, &username, &department, &created)
-//		checkErr(err)
-//		fmt.Println(uid)
-//		fmt.Println(username)
-//		fmt.Println(department)
-//		fmt.Println(created)
-//	}
-//
-//	//delete
-//	stmt, err = db.Prepare("delete from userinfo where uid=?")
-//	checkErr(err)
-//
-//	res, err = stmt.Exec(id)
-//	checkErr(err)
-//
-//	affect, err = res.RowsAffected()
-//	checkErr(err)
-//
-//	fmt.Println(affect)
-//
-//	db.Close()
-//
-//}
+	res, err := stmt.Exec(count, id)
+	rowId, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+		return 0, err
+	}
+	return rowId, nil
+}
 
 func checkErr(err error) {
 	if err != nil {

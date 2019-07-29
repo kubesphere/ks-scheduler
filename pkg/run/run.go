@@ -6,18 +6,19 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/soulseen/ks-pipeline-schduler/pkg/predicate"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/prioritize"
-	"github.com/soulseen/ks-pipeline-schduler/pkg/routes"
-	_ "github.com/soulseen/ks-pipeline-schduler/pkg/sqlite"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/controller"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/predicate"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/routes"
+	_ "github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
 
 	log "github.com/golang/glog"
 )
 
 var (
 	PipelinePriority = prioritize.Prioritize{
-		Name:      "pipeline",
-		Func:      prioritize.Pipeline,
+		Name: "pipeline",
+		Func: prioritize.Pipeline,
 	}
 
 	TruePredicate = predicate.Predicate{
@@ -27,10 +28,11 @@ var (
 )
 
 func Run() {
-	//log.Info("Log level was set to ", strings.ToUpper(level.String()))
 
 	flag.Parse()
 
+	log.Info("Start controller ....")
+	controller.RunController()
 
 	router := httprouter.New()
 	routes.AddVersion(router)

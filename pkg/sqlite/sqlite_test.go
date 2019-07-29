@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestInsterData(t *testing.T) {
+func TestKeyNodeInserta(t *testing.T) {
 	type parseSqliteData struct {
 		key      string
 		nodeName string
@@ -25,7 +25,30 @@ func TestInsterData(t *testing.T) {
 			t.Errorf("insert to db error: ")
 		}
 	}
-	row,_ := KeyNodeCilent.KeyNodeSearch("jenkins", "node1")
+	row, _ := KeyNodeCilent.KeyNodeSearch("jenkins", "node1")
 	fmt.Println(row)
 	//os.Remove("/Users/xiaoyangzhu/work/test/sqlite/test.db")
+}
+
+func TestKeyNodeUpdate(t *testing.T) {
+	type parseUpdateData struct {
+		id       int64
+		count    int
+	}
+	dbCilent := InitKeyNodeTable()
+
+	tests := []parseUpdateData{
+		{1, 2},
+		{2, 8},
+		{3, 1},
+		{4, 20},
+	}
+
+	for _, data := range tests {
+		if res, err := dbCilent.KeyNodeUpdate(data.id, data.count); err != nil || res != data.id {
+			fmt.Println(err)
+			t.Errorf("insert to db error: ")
+		}
+	}
+
 }
