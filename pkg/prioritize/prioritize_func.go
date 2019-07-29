@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const DEFAULT_LABEL = "ks-pipeline"
+const DEFAULT_PIPELINE_LABEL = "ks-pipeline"
 
 var (
 	TotalScore float64 = 10
@@ -17,7 +17,7 @@ var (
 func Pipeline(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error) {
 	var priorityList schedulerapi.HostPriorityList
 	priorityList = make([]schedulerapi.HostPriority, len(nodes))
-	keys := parseMark(pod.Labels)
+	keys := ParseMark(pod.Labels)
 	if keys == nil {
 		return zeroScore(nodes), nil
 	}
@@ -36,10 +36,10 @@ func Pipeline(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, erro
 	return &priorityList, nil
 }
 
-func parseMark(labels map[string]string) ([]string) {
-	label, exists := labels[DEFAULT_LABEL]
+func ParseMark(labels map[string]string) []string {
+	label, exists := labels[DEFAULT_PIPELINE_LABEL]
 	if exists == false {
-		log.Info("Not exists default label: ", DEFAULT_LABEL)
+		log.Info("Not exists default label: ", DEFAULT_PIPELINE_LABEL)
 		return nil
 	}
 	keys := strings.Split(label, "-")
@@ -61,14 +61,14 @@ func Calculation(keys []string, nodeName string) (int, error) {
 		}
 		if len(row) != 0 {
 			score = int(float64(i)*scoreSegment + scoreSegment + float64(row[0].Count/10))
-			log.Info("Calculation result: key - ", keys[i], "score - ", score)
+			log.Info("Calculation result: key-", keys[i], " score-", score)
 			break
 		}
 	}
 	return score, nil
 }
 
-func zeroScore(nodes []v1.Node) (*schedulerapi.HostPriorityList) {
+func zeroScore(nodes []v1.Node) *schedulerapi.HostPriorityList {
 	var priorityList schedulerapi.HostPriorityList
 	priorityList = make([]schedulerapi.HostPriority, len(nodes))
 	for i, node := range nodes {

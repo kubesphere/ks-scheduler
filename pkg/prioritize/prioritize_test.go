@@ -18,7 +18,7 @@ func TestParseMark(t *testing.T) {
 	}
 
 	for _, lb := range tests {
-		if res := parseMark(lb.labels); ! reflect.DeepEqual(res, lb.expected) {
+		if res := ParseMark(lb.labels); !reflect.DeepEqual(res, lb.expected) {
 			t.Errorf(lb.labels["ks-pipeline"])
 			t.Errorf("Expected key %s, but got %s", lb.expected, res)
 		}
@@ -35,10 +35,10 @@ func TestCalculation(t *testing.T) {
 	}
 
 	tests := []parseMarkData{
-		{name: "a-b-c-d",keys: []string{"keya", "keyab", "keyac", "keyad"}, nodeName: "node1", expected: 10},
-		{name: "a-b-c",keys: []string{"keya", "keyab", "keyac"}, nodeName: "node1", expected: 6},
-		{name: "z-x-y",keys: []string{"z", "x", "y"}, nodeName: "node1", expected: 1},
-		{name: "z-x-a",keys: []string{"z", "x", "keya"}, nodeName: "node1", expected: 10},
+		{name: "a-b-c-d", keys: []string{"keya", "keyab", "keyac", "keyad"}, nodeName: "node1", expected: 10},
+		{name: "a-b-c", keys: []string{"keya", "keyab", "keyac"}, nodeName: "node1", expected: 6},
+		{name: "z-x-y", keys: []string{"z", "x", "y"}, nodeName: "node1", expected: 1},
+		{name: "z-x-a", keys: []string{"z", "x", "keya"}, nodeName: "node1", expected: 10},
 	}
 
 	for _, match := range tests {

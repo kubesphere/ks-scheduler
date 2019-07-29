@@ -32,8 +32,8 @@ func TestKeyNodeInserta(t *testing.T) {
 
 func TestKeyNodeUpdate(t *testing.T) {
 	type parseUpdateData struct {
-		id       int64
-		count    int
+		id    int
+		count int
 	}
 	dbCilent := InitKeyNodeTable()
 
@@ -45,7 +45,7 @@ func TestKeyNodeUpdate(t *testing.T) {
 	}
 
 	for _, data := range tests {
-		if res, err := dbCilent.KeyNodeUpdate(data.id, data.count); err != nil || res != data.id {
+		if res, err := dbCilent.KeyNodeUpdate(data.id, data.count); err != nil || res != int64(data.id) {
 			fmt.Println(err)
 			t.Errorf("insert to db error: ")
 		}

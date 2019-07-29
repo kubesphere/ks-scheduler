@@ -32,7 +32,7 @@ func Run() {
 	flag.Parse()
 
 	log.Info("Start controller ....")
-	controller.RunController()
+	go controller.RunController()
 
 	router := httprouter.New()
 	routes.AddVersion(router)

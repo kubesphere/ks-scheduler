@@ -2,7 +2,9 @@ package controller
 
 import (
 	"fmt"
-	"github.com/golang/glog"
+	log "github.com/golang/glog"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
+	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -18,17 +20,11 @@ import (
 )
 
 const (
-	// maxRetries is the number of times a service will be retried before it is dropped out of the queue.
-	// With the current rate-limiter in use (5ms*2^(maxRetries-1)) the following numbers represent the
-	// sequence of delays between successive queuings of a service.
-	//
-	// 5ms, 10ms, 20ms, 40ms, 80ms, 160ms, 320ms, 640ms, 1.3s, 2.6s, 5.1s, 10.2s, 20.4s, 41s, 82s
-	maxRetries = 15
+	maxRetries = 5
 
 	defaultResync = 600 * time.Second
 
-	DefaultLabelKey   = "scheduler"
-	DefaultLabelValue = "ks-scheduler"
+	DefaultLabelKey = "ks-pipeline"
 )
 
 type Controller struct {
@@ -43,7 +39,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) {
 	// close queue and shutdown work.
 	defer c.queue.ShutDown()
 
-	glog.Info("start controller...")
+	log.Info("start controller...")
 
 	// run Informer
 	go c.informer.Run(stopCh)
@@ -59,7 +55,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) {
 	}
 
 	<-stopCh
-	glog.Info("Stopping Pod controller")
+	log.Info("Stopping Pod controller")
 }
 
 func (c *Controller) runWorker() {
@@ -86,46 +82,61 @@ func (c *Controller) processNextItem() bool {
 }
 
 func (c *Controller) processItem(key string) error {
-	glog.Infof("Start procrss event %s", key)
+	log.Infof("Start procrss event %s", key)
 	obj, exists, err := c.indexer.GetByKey(key)
+	pod := obj.(*apiv1.Pod)
 	if err != nil {
-		glog.Errorf("Fetching object with key %s from store failed with %v", key, err)
+		log.Errorf("Fetching object with key %s from store failed with %v", key, err)
 		return err
 	}
 
-	if !exists {
-		// Below we will warm up our cache with a Pod, so that we will see a delete for one pod
-		fmt.Printf("Pod %s does not exist anymore\n", key)
+	if exists {
+		name := pod.GetName()
+		keys := prioritize.ParseMark(pod.Labels)
+		lastKey := keys[len(keys)-1]
+		bindingNode := pod.Spec.NodeName
+		res, err := sqlite.KeyNodeCilent.KeyNodeSearch(lastKey, bindingNode)
+		if err != nil {
+			log.Errorf("Search object with key %s from sqlite error: ", err)
+			return err
+		}
+		if len(res) != 0 {
+			log.Info("update record: ", lastKey, ":", bindingNode, ":", res[0].Count+1)
+			sqlite.KeyNodeCilent.KeyNodeUpdate(res[0].Id, res[0].Count+1)
+		} else {
+			log.Info("insert record: ", lastKey, ":", bindingNode)
+			sqlite.KeyNodeCilent.KeyNodeInsert(lastKey, bindingNode, 1)
+		}
+
+		log.Info("Process success for Pod: ", name)
+
 	} else {
-		// Note that you also have to check the uid if you have a local controlled resource, which
-		// is dependent on the actual instance, to detect that a Pod was recreated with the same name
-		fmt.Printf("Sync/Add/Update for Pod %s\n", obj.(*apiv1.Pod).GetName())
+		log.Info("Pod: ", key, " does not exist anymore")
 	}
 	return nil
 }
 
 func RunController() {
 	// Get a config to talk to the apiserver
-	glog.Info("setting up client for manager")
+	log.Info("setting up client for manager")
 
 	cfg, err := config.GetConfig()
 	if err != nil {
-		glog.Error(err, "unable to set up client config")
+		log.Error(err, "unable to set up client config")
 		os.Exit(1)
 	}
 
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		glog.Fatalf("build clientset error: %s", err.Error())
+		log.Fatalf("build clientset error: %s", err.Error())
 	}
 
-	//TODO
-	//setLabel := map[string]string{"scheduler": "ks-scheduler"}
-	//
-	//selectPod := fields.SelectorFromSet(setLabel)
+	setLabel := map[string]string{"spec.schedulerName": "ks-scheduler"}
 
-	podListWatcher := cache.NewListWatchFromClient(clientset.CoreV1().RESTClient(), "pods", apiv1.NamespaceDefault, fields.Everything())
+	selectPod := fields.SelectorFromSet(setLabel)
+
+	podListWatcher := cache.NewListWatchFromClient(clientset.CoreV1().RESTClient(), "pods", apiv1.NamespaceAll, selectPod)
 
 	stopCh := signals.SetupSignalHandler()
 
@@ -147,6 +158,7 @@ func RunController() {
 				case *apiv1.Pod:
 					res := assignedPod(t)
 					if res == true {
+						log.Info("add queue with pod name: ", t.GetName())
 						key, err := cache.MetaNamespaceKeyFunc(obj)
 						if err == nil {
 							queue.Add(key)
@@ -177,15 +189,12 @@ func RunController() {
 // assignedPod selects pods that are assigned (scheduled and running).
 func assignedPod(pod *apiv1.Pod) bool {
 	if len(pod.Spec.NodeName) == 0 {
-		glog.Info("not have binding node")
 		return false
 	}
 	if pod.Status.Phase != apiv1.PodRunning {
-		glog.Info("Status not Running")
 		return false
 	}
-	if pod.Labels[DefaultLabelKey] != DefaultLabelValue {
-		glog.Info("no scheduler label")
+	if _, ok := pod.Labels[DefaultLabelKey]; !ok {
 		return false
 	}
 	return true
@@ -194,25 +203,19 @@ func assignedPod(pod *apiv1.Pod) bool {
 // handleErr checks if an error happened and makes sure we will retry later.
 func (c *Controller) handleErr(err error, key interface{}) {
 	if err == nil {
-		// Forget about the #AddRateLimited history of the key on every successful synchronization.
-		// This ensures that future processing of updates for this key is not delayed because of
-		// an outdated error history.
 		c.queue.Forget(key)
 		return
 	}
 
 	// This controller retries 5 times if something goes wrong. After that, it stops trying.
 	if c.queue.NumRequeues(key) < maxRetries {
-		glog.Info("Error syncing pod %v: %v", key, err)
+		log.Info("Error syncing pod ", key, ". error:", err)
 
-		// Re-enqueue the key rate limited. Based on the rate limiter on the
-		// queue and the re-enqueue history, the key will be processed later again.
 		c.queue.AddRateLimited(key)
 		return
 	}
 
 	c.queue.Forget(key)
-	// Report to an external entity that, even after several retries, we could not successfully process this key
 	runtime.HandleError(err)
-	glog.Infof("Dropping pod %q out of the queue: %v", key, err)
+	log.Infof("Dropping pod %q out of the queue: %v", key, err)
 }

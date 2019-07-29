@@ -1,3 +1,134 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:ks-scheduler
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resourceNames:
+      - kube-scheduler
+      - ks-scheduler
+    resources:
+      - endpoints
+    verbs:
+      - delete
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - delete
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - bindings
+      - pods/binding
+    verbs:
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - pods/status
+    verbs:
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - replicationcontrollers
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+      - extensions
+    resources:
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - policy
+    resources:
+      - poddisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - persistentvolumeclaims
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - delete
+      - deletecollection
+      - patch
+      - update
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - list
+      - get
+      - watch
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -66,7 +197,7 @@ subjects:
     namespace: kubesphere-system
 roleRef:
   kind: ClusterRole
-  name: system:kube-scheduler
+  name: system:ks-scheduler
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1
@@ -112,8 +243,8 @@ spec:
           - name: ks-scheduler-config
             mountPath: /ks-scheduler
         - name: ks-scheduler-pipeline
-          image: zhuxiaoyang/ks-pipeline-scheduler:alpine
-          imagePullPolicy: IfNotPresent
+          image: zhuxiaoyang/ks-pipeline-scheduler:v1
+          imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /version

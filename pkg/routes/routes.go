@@ -48,14 +48,13 @@ func PredicateRoute(predicate predicate.Predicate) httprouter.Handle {
 				Error:       err.Error(),
 			}
 		} else {
-			log.Info("body: ", extenderArgs)
+			log.Info("pod: ", extenderArgs.Pod.Name)
 			extenderFilterResult = predicate.Handler(extenderArgs)
 		}
 
 		if resultBody, err := json.Marshal(extenderFilterResult); err != nil {
 			panic(err)
 		} else {
-			log.Info("info: ", predicate.Name, " extenderFilterResult = ", string(resultBody))
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			w.Write(resultBody)
@@ -71,7 +70,6 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 		body := io.TeeReader(r.Body, &buf)
 		log.Info("info: " + prioritize.Name + " ExtenderArgs = " + buf.String())
 		log.Info("func PrioritizeRoute")
-
 
 		var extenderArgs schedulerapi.ExtenderArgs
 		var hostPriorityList *schedulerapi.HostPriorityList
@@ -111,7 +109,6 @@ func DebugLogging(h httprouter.Handle, path string) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Info("debug: ", path)
 		h(w, r, p)
-		log.Info("debug: ", path, " response=", w)
 	}
 }
 

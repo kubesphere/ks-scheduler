@@ -21,7 +21,7 @@ const (
 
 var KeyNodeCilent = InitKeyNodeTable()
 
-func InitKeyNodeTable() (KeyNodeTable) {
+func InitKeyNodeTable() KeyNodeTable {
 	db, err := sql.Open("sqlite3", os.Getenv("DATA_PATH"))
 	err = db.Ping()
 	checkErr(err)
@@ -38,7 +38,7 @@ func CreateTable(db *sql.DB, sql string) {
 	checkErr(error)
 }
 
-func (kn *KeyNodeTable) KeyNodeInsert(key, nodeName string, count int) (id int64, err error) {
+func (kn *KeyNodeTable) KeyNodeInsert(key, nodeName string, count int) (id int, err error) {
 	tx, err := kn.SQLiteDB.Begin()
 	stmt, err := tx.Prepare("INSERT INTO key_node(podkey, nodename, count) VALUES (?,?,?)")
 	if err != nil {
@@ -53,7 +53,7 @@ func (kn *KeyNodeTable) KeyNodeInsert(key, nodeName string, count int) (id int64
 }
 
 func (kn *KeyNodeTable) KeyNodeSearch(podKey string, nodeName string) ([]KeyNodeTable, error) {
-	rows, err := kn.SQLiteDB.Query("SELECT *  FROM key_node WHERE podkey = ? AND nodename = ?", podKey,nodeName)
+	rows, err := kn.SQLiteDB.Query("SELECT *  FROM key_node WHERE podkey = ? AND nodename = ?", podKey, nodeName)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +71,14 @@ func (kn *KeyNodeTable) KeyNodeSearch(podKey string, nodeName string) ([]KeyNode
 		res = append(res, KeyNodeTable{
 			Id:     id,
 			PodKey: podkey,
-			Count: count,
+			Count:  count,
 		})
 	}
 	return res, nil
 
 }
 
-func (kn *KeyNodeTable) KeyNodeUpdate(id int64, count int)(int64, error){
+func (kn *KeyNodeTable) KeyNodeUpdate(id int, count int) (int64, error) {
 	//update
 	stmt, err := kn.SQLiteDB.Prepare("update key_node set count=? where id=?")
 	checkErr(err)

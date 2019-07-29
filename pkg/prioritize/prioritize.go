@@ -1,14 +1,14 @@
 package prioritize
 
 import (
-	"k8s.io/api/core/v1"
 	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
+	"k8s.io/api/core/v1"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 
 type Prioritize struct {
-	Name string
-	Func func(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error)
+	Name      string
+	Func      func(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error)
 	Datatable sqlite.KeyNodeTable
 }
 
