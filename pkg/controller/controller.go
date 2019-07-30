@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 	log "github.com/golang/glog"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
+	"github.com/soulseen/ks-scheduler/pkg/prioritize"
+	"github.com/soulseen/ks-scheduler/pkg/sqlite"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -93,19 +93,12 @@ func (c *Controller) processItem(key string) error {
 	if exists {
 		name := pod.GetName()
 		keys := prioritize.ParseMark(pod.Labels)
-		lastKey := keys[len(keys)-1]
 		bindingNode := pod.Spec.NodeName
-		res, err := sqlite.KeyNodeCilent.KeyNodeSearch(lastKey, bindingNode)
-		if err != nil {
-			log.Errorf("Search object with key %s from sqlite error: ", err)
-			return err
-		}
-		if len(res) != 0 {
-			log.Info("update record: ", lastKey, ":", bindingNode, ":", res[0].Count+1)
-			sqlite.KeyNodeCilent.KeyNodeUpdate(res[0].Id, res[0].Count+1)
-		} else {
-			log.Info("insert record: ", lastKey, ":", bindingNode)
-			sqlite.KeyNodeCilent.KeyNodeInsert(lastKey, bindingNode, 1)
+		for _, key := range keys {
+			err := addUpdateKeyNode(key, bindingNode)
+			if err != nil {
+				log.Error("update key: ", key, " error: ", err)
+			}
 		}
 
 		log.Info("Process success for Pod: ", name)
@@ -114,6 +107,23 @@ func (c *Controller) processItem(key string) error {
 		log.Info("Pod: ", key, " does not exist anymore")
 	}
 	return nil
+}
+
+func addUpdateKeyNode(key, node string) error {
+	res, err := sqlite.KeyNodeCilent.KeyNodeSearch(key, node)
+	if err != nil {
+		log.Errorf("Search object with key %s from sqlite error: ", err)
+		return err
+	}
+	if len(res) != 0 {
+		log.Info("update record: ", key, ":", node, ":", res[0].Count+1)
+		sqlite.KeyNodeCilent.KeyNodeUpdate(res[0].Id, res[0].Count+1)
+		return nil
+	} else {
+		log.Info("insert record: ", key, ":", node)
+		sqlite.KeyNodeCilent.KeyNodeInsert(key, node, 1)
+		return nil
+	}
 }
 
 func RunController() {

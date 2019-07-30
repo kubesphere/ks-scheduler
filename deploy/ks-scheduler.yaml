@@ -243,8 +243,8 @@ spec:
           - name: ks-scheduler-config
             mountPath: /ks-scheduler
         - name: ks-scheduler-pipeline
-          image: zhuxiaoyang/ks-pipeline-scheduler:v1
-          imagePullPolicy: Always
+          image: zhuxiaoyang/ks-scheduler:v1
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             httpGet:
               path: /version

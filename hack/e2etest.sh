@@ -1,1 +1,26 @@
-#!/usr/bin/env bash
+#!/bin/bash
+set -e
+
+function cleanup(){
+    result=$?
+    echo "Cleaning"
+    kubectl delete ns $TEST_NS
+    exit $result
+}
+
+dest="./deploy/ks-scheduler.yaml"
+#tag=`git rev-parse --short HEAD`
+tag=v1
+IMG=zhuxiaoyang/ks-scheduler:$tag
+TEST_NS=schduler-test-$tag
+
+trap cleanup EXIT SIGINT SIGQUIT
+#docker build -f Dockerfile -t ${IMG} .
+#docker push $IMG
+
+kubectl create ns  $TEST_NS
+kubectl create -f $dest
+
+export TEST_NS
+
+go test -v ./test/e2e/

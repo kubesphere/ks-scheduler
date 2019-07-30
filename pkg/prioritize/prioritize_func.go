@@ -2,7 +2,7 @@ package prioritize
 
 import (
 	log "github.com/golang/glog"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
+	"github.com/soulseen/ks-scheduler/pkg/sqlite"
 	"k8s.io/api/core/v1"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 	"strings"

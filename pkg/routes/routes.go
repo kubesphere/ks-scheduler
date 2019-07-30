@@ -9,8 +9,8 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/predicate"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
+	"github.com/soulseen/ks-scheduler/pkg/predicate"
+	"github.com/soulseen/ks-scheduler/pkg/prioritize"
 
 	log "github.com/golang/glog"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"

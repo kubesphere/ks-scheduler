@@ -9,7 +9,7 @@ ENV GOMOD=/root/go.mod
 WORKDIR /root/
 COPY . .
 RUN apk add --no-cache gcc musl-dev
-RUN GOOS=linux GOARCH=amd64 go build -mod=vendor -a -o ks-pipeline-scheduler /root/cmd
+RUN GOOS=linux GOARCH=amd64 go build -mod=vendor -a -o bin/ks-scheduler /root/cmd
 
 # runtime image
 FROM alpine:latest
@@ -18,6 +18,6 @@ ENV DATA_PATH=/data/scheduler.db
 
 RUN mkdir /data
 
-COPY --from=builder /root/ks-pipeline-scheduler .
+COPY --from=builder /root/ks-scheduler .
 
-CMD ["./ks-pipeline-scheduler", "--logtostderr=true", "--v=6"]
+CMD ["./ks-scheduler", "--logtostderr=true", "--v=6"]

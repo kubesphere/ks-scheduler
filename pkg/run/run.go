@@ -6,11 +6,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/controller"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/predicate"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/prioritize"
-	"github.com/soulseen/ks-pipeline-scheduler/pkg/routes"
-	_ "github.com/soulseen/ks-pipeline-scheduler/pkg/sqlite"
+	"github.com/soulseen/ks-scheduler/pkg/controller"
+	"github.com/soulseen/ks-scheduler/pkg/predicate"
+	"github.com/soulseen/ks-scheduler/pkg/prioritize"
+	"github.com/soulseen/ks-scheduler/pkg/routes"
+	_ "github.com/soulseen/ks-scheduler/pkg/sqlite"
 
 	log "github.com/golang/glog"
 )
