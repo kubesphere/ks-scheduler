@@ -9,14 +9,13 @@ function cleanup(){
 }
 
 dest="./deploy/ks-scheduler.yaml"
-#tag=`git rev-parse --short HEAD`
-tag=v1
+tag=test-e2e
 IMG=zhuxiaoyang/ks-scheduler:$tag
-TEST_NS=schduler-test-$tag
+TEST_NS=schduler-test
 
 trap cleanup EXIT SIGINT SIGQUIT
-#docker build -f Dockerfile -t ${IMG} .
-#docker push $IMG
+docker build -f Dockerfile -t ${IMG} .
+docker push $IMG
 
 kubectl create ns  $TEST_NS
 kubectl create -f $dest

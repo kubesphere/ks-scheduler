@@ -1,4 +1,4 @@
-FROM golang:1.12-alpine as builder
+FROM zhuxiaoyang/golang:1.12-alpine as builder
 
 ENV CGO_ENABLED=1
 ENV VERSION=2.1.0
@@ -8,8 +8,7 @@ ENV GOMOD=/root/go.mod
 # build
 WORKDIR /root/
 COPY . .
-RUN apk add --no-cache gcc musl-dev
-RUN GOOS=linux GOARCH=amd64 go build -mod=vendor -a -o bin/ks-scheduler /root/cmd
+RUN GOOS=linux GOARCH=amd64 go build -mod=vendor -a -o ks-scheduler /root/cmd
 
 # runtime image
 FROM alpine:latest

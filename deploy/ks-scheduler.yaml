@@ -227,6 +227,9 @@ spec:
       - name: ks-scheduler-config
         configMap:
           name: ks-scheduler-config
+#      - name: data
+#        persistentVolumeClaim:
+#          claimName: ks-scheduler-data
       containers:
         - name: ks-scheduler
           image: dockerhub.qingcloud.com/google_containers/hyperkube:v1.13.5
@@ -242,16 +245,18 @@ spec:
           volumeMounts:
           - name: ks-scheduler-config
             mountPath: /ks-scheduler
+#          - mountPath: /data
+#            name: data
         - name: ks-scheduler-pipeline
           image: zhuxiaoyang/ks-scheduler:v1
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /version
-              port: 8080
-          readinessProbe:
-            httpGet:
-              path: /version
-              port: 8080
+#          livenessProbe:
+#            httpGet:
+#              path: /version
+#              port: 8080
+#          readinessProbe:
+#            httpGet:
+#              path: /version
+#              port: 8080
           ports:
             - containerPort: 8080
