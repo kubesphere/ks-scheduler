@@ -1,5 +1,10 @@
 package controller
 
+//import (
+//	"reflect"
+//	"testing"
+//)
+//
 //func TestProcessNextItem(t *testing.T) {
 //
 //	type parseMarkData struct {
@@ -13,7 +18,7 @@ package controller
 //	}
 //
 //	for _, lb := range tests {
-//		if res := processNextItem(lb.labels); ! reflect.DeepEqual(res, lb.expected) {
+//		if res := processItem(lb.labels); ! reflect.DeepEqual(res, lb.expected) {
 //			t.Errorf(lb.labels["ks-pipeline"])
 //			t.Errorf("Expected key %s, but got %s", lb.expected, res)
 //		}

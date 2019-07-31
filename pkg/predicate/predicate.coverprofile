@@ -1,0 +1,8 @@
+mode: atomic
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate_func.go:7.57,9.2 1 1
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:13.95,18.40 4 0
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:29.2,37.16 2 0
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:18.40,20.17 2 0
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:20.17,22.4 1 0
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:22.9,23.14 1 0
+github.com/soulseen/ks-scheduler/pkg/predicate/predicate.go:23.14,25.5 1 0

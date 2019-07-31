@@ -15,7 +15,7 @@ TEST_NS=schduler-test
 
 trap cleanup EXIT SIGINT SIGQUIT
 docker build -f Dockerfile -t ${IMG} .
-docker push $IMG
+#docker push $IMG
 
 kubectl create ns  $TEST_NS
 kubectl create -f $dest

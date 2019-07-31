@@ -19,18 +19,16 @@ const (
 	;`
 )
 
-var KeyNodeCilent = InitKeyNodeTable()
+var KeyNodeCilent KeyNodeTable
 
-func InitKeyNodeTable() KeyNodeTable {
+func init() {
 	db, err := sql.Open("sqlite3", os.Getenv("DATA_PATH"))
 	err = db.Ping()
 	checkErr(err)
 	CreateTable(db, CREATE_TABLE_SQL)
-	KeyNodeCilent := KeyNodeTable{
+	KeyNodeCilent = KeyNodeTable{
 		SQLiteDB: db,
 	}
-
-	return KeyNodeCilent
 }
 
 func CreateTable(db *sql.DB, sql string) {

@@ -89,7 +89,7 @@ func PrioritizeRoute(prioritize prioritize.Prioritize) httprouter.Handle {
 		if resultBody, err := json.Marshal(hostPriorityList); err != nil {
 			panic(err)
 		} else {
-			log.Info("info: ", prioritize.Name," pod: ",extenderArgs.Pod.Name, " hostPriorityList = ", string(resultBody))
+			log.Info("info: ", prioritize.Name, " pod: ", extenderArgs.Pod.Name, " hostPriorityList = ", string(resultBody))
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			w.Write(resultBody)
