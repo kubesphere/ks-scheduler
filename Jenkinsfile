@@ -1,9 +1,31 @@
 pipeline {
     agent{
-        node {
-            label 'go'
-        }
+    kubernetes {
+      label 's2i'
+      yaml '''apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: ks-scheduler
+    image: zhuxiaoyang/golang-1.12-ks-scheduler:latest
+    command: [\'cat\']
+    tty: true
+    volumeMounts:
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+    - name: dockerbin
+      mountPath: /usr/bin/docker
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+  - name: dockerbin
+    hostPath:
+      path: /usr/bin/docker
+      '''
+      defaultContainer 'ks-scheduler'
     }
+}
 
     environment {
         DATA_PATH = '/tmp/test.db'
@@ -11,6 +33,7 @@ pipeline {
         KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
         DOCKERHUB_NAMESPACE = 'zhuxiaoyang'
         GITHUB_ACCOUNT = 'soulseen'
+        KUBECONFIG = '/root/.kube/config'
     }
 
     stages {
@@ -30,21 +53,17 @@ pipeline {
 //            }
 //        }
 
-        stage ('unit test') {
-            steps {
-                container ('go') {
-                    sh 'make test'
-                }
-            }
-        }
+//        stage ('unit test') {
+//           steps {
+//                container ('go') {
+//                    sh 'make test'
+//                }
+//            }
+//        }
 
         stage ('e2e test') {
             steps {
-                sh '''
-                mkdir -p /go/src/github.com/soulseen
-                ln -s `pwd` /go/src/github.com/soulseen/ks-scheduler
-                cd /go/src/github.com/soulseen/ks-scheduler
-                make e2e-test'''
+                sh './hack/e2etest.sh'
             }
         }
     }
