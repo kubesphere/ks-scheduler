@@ -11,7 +11,7 @@ function cleanup(){
 dest="./deploy/ks-scheduler.yaml"
 tag=test-e2e
 IMG=zhuxiaoyang/ks-scheduler:$tag
-TEST_NS=schduler-test
+TEST_NS=scheduler-test
 
 trap cleanup EXIT SIGINT SIGQUIT
 docker build -f Dockerfile -t ${IMG} .
@@ -22,4 +22,4 @@ kubectl create -f $dest
 
 export TEST_NS
 
-go test -v ./test/e2e/
+go test -mod=vendor -v ./test/e2e/

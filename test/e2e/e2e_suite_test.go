@@ -32,7 +32,6 @@ func TestE2e(t *testing.T) {
 var _ = BeforeSuite(func() {
 	//install deploy
 	testNamespace = os.Getenv("TEST_NS")
-	//testNamespace = "schduler-test"
 	Expect(testNamespace).ShouldNot(BeEmpty())
 	workspace = getWorkspace() + "/../.."
 	cfg, err := config.GetConfig()
