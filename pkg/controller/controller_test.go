@@ -13,13 +13,13 @@ package controller
 //	}
 //
 //	tests := []parseMarkData{
-//		{labels: map[string]string{"ks-pipeline": "jenkins-java-maven-1"}, expected: []string{"jenkins", "java", "maven", "1"}},
-//		{labels: map[string]string{"ks-pipeline": "jenk/ins-java-maven-1/"}, expected: []string{"jenk/ins", "java", "maven", "1/"}},
+//		{labels: map[string]string{"ks-devops": "jenkins-java-maven-1"}, expected: []string{"jenkins", "java", "maven", "1"}},
+//		{labels: map[string]string{"ks-devops": "jenk/ins-java-maven-1/"}, expected: []string{"jenk/ins", "java", "maven", "1/"}},
 //	}
 //
 //	for _, lb := range tests {
 //		if res := processItem(lb.labels); ! reflect.DeepEqual(res, lb.expected) {
-//			t.Errorf(lb.labels["ks-pipeline"])
+//			t.Errorf(lb.labels["ks-devops"])
 //			t.Errorf("Expected key %s, but got %s", lb.expected, res)
 //		}
 //	}

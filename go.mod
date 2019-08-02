@@ -1,4 +1,4 @@
-module github.com/soulseen/ks-scheduler
+module github.com/kubesphere/ks-scheduler
 
 go 1.12
 

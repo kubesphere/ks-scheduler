@@ -247,7 +247,7 @@ spec:
             mountPath: /ks-scheduler
 #          - mountPath: /data
 #            name: data
-        - name: ks-scheduler-pipeline
+        - name: ks-scheduler-devops
           image: zhuxiaoyang/ks-scheduler:v1
           imagePullPolicy: IfNotPresent
 #          livenessProbe:
