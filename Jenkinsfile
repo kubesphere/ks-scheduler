@@ -32,7 +32,7 @@ spec:
         GITHUB_CREDENTIAL_ID = 'github-id'
         KUBECONFIG_CREDENTIAL_ID = 'kubeconfig'
         DOCKERHUB_NAMESPACE = 'zhuxiaoyang'
-        GITHUB_ACCOUNT = 'soulseen'
+        GITHUB_ACCOUNT = 'kubesphere'
         KUBECONFIG = '/root/.kube/config'
     }
 

@@ -4,7 +4,7 @@ metadata:
   name: test-2
   namespace: scheduler-test
   labels:
-    ks-pipeline: a-c-e
+    ks-devops: a-c-e
 spec:
   schedulerName: ks-scheduler
   containers:

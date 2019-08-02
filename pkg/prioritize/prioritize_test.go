@@ -1,9 +1,9 @@
 package prioritize
 
 import (
+	"github.com/kubesphere/ks-scheduler/pkg/sqlite"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/soulseen/ks-scheduler/pkg/sqlite"
 	"reflect"
 )
 
@@ -58,9 +58,9 @@ var _ = Describe("Test prioritize", func() {
 		}
 
 		tests := []parseMarkData{
-			{labels: map[string]string{"ks-pipeline": "jenkins-java-maven-1"}, expected: []string{"jenkins", "java", "maven", "1"}},
-			{labels: map[string]string{"ks-pipeline": "jenk/ins-java-maven-1/"}, expected: []string{"jenk/ins", "java", "maven", "1/"}},
-			{labels: map[string]string{"ks-pipeline": "jenkins"}, expected: []string{"jenkins"}},
+			{labels: map[string]string{"ks-devops": "jenkins-java-maven-1"}, expected: []string{"jenkins", "java", "maven", "1"}},
+			{labels: map[string]string{"ks-devops": "jenk/ins-java-maven-1/"}, expected: []string{"jenk/ins", "java", "maven", "1/"}},
+			{labels: map[string]string{"ks-devops": "jenkins"}, expected: []string{"jenkins"}},
 		}
 
 		for _, lb := range tests {

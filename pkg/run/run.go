@@ -6,11 +6,11 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"github.com/soulseen/ks-scheduler/pkg/controller"
-	"github.com/soulseen/ks-scheduler/pkg/predicate"
-	"github.com/soulseen/ks-scheduler/pkg/prioritize"
-	"github.com/soulseen/ks-scheduler/pkg/routes"
-	_ "github.com/soulseen/ks-scheduler/pkg/sqlite"
+	"github.com/kubesphere/ks-scheduler/pkg/controller"
+	"github.com/kubesphere/ks-scheduler/pkg/predicate"
+	"github.com/kubesphere/ks-scheduler/pkg/prioritize"
+	"github.com/kubesphere/ks-scheduler/pkg/routes"
+	_ "github.com/kubesphere/ks-scheduler/pkg/sqlite"
 
 	log "github.com/golang/glog"
 )

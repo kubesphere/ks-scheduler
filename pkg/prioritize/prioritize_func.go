@@ -2,13 +2,13 @@ package prioritize
 
 import (
 	log "github.com/golang/glog"
-	"github.com/soulseen/ks-scheduler/pkg/sqlite"
+	"github.com/kubesphere/ks-scheduler/pkg/sqlite"
 	"k8s.io/api/core/v1"
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 	"strings"
 )
 
-const DEFAULT_PIPELINE_LABEL = "ks-pipeline"
+const DefaultLabelKey = "ks-devops"
 
 var (
 	TotalScore float64 = 10
@@ -37,9 +37,9 @@ func Pipeline(pod v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, erro
 }
 
 func ParseMark(labels map[string]string) []string {
-	label, exists := labels[DEFAULT_PIPELINE_LABEL]
+	label, exists := labels[DefaultLabelKey]
 	if exists == false {
-		log.Info("Not exists default label: ", DEFAULT_PIPELINE_LABEL)
+		log.Info("Not exists default label: ", DefaultLabelKey)
 		return nil
 	}
 	keys := strings.Split(label, "-")

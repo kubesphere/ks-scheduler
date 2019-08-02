@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/soulseen/ks-scheduler/pkg/util"
+	"github.com/kubesphere/ks-scheduler/pkg/util"
 )
 
 var (

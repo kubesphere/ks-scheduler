@@ -3,8 +3,8 @@ package controller
 import (
 	"fmt"
 	log "github.com/golang/glog"
-	"github.com/soulseen/ks-scheduler/pkg/prioritize"
-	"github.com/soulseen/ks-scheduler/pkg/sqlite"
+	"github.com/kubesphere/ks-scheduler/pkg/prioritize"
+	"github.com/kubesphere/ks-scheduler/pkg/sqlite"
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -23,8 +23,6 @@ const (
 	maxRetries = 5
 
 	defaultResync = 600 * time.Second
-
-	DefaultLabelKey = "ks-pipeline"
 )
 
 type Controller struct {
@@ -204,7 +202,7 @@ func assignedPod(pod *apiv1.Pod) bool {
 	if pod.Status.Phase != apiv1.PodRunning {
 		return false
 	}
-	if _, ok := pod.Labels[DefaultLabelKey]; !ok {
+	if _, ok := pod.Labels[prioritize.DefaultLabelKey]; !ok {
 		return false
 	}
 	return true
